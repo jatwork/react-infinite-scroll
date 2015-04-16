@@ -47,9 +47,8 @@ module.exports = function (React) {
     scrollListener: function () {
       if (!this.updated) return;
       var coords = this.getDOMNode().getBoundingClientRect();
-      var cutoff = (window.innerHeight || document.documentElement.clientHeight) + this.props.threshold;
 
-      if ((coords.bottom >= 0 && coords.left >= 0 && coords.bottom) <= cutoff) {
+      if (coords.bottom < window.innerHeight + this.props.threshold) {
         this.updated = false;
         this.props.loadMore(this.pageLoaded += 1);
       }
