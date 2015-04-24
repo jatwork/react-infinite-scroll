@@ -2,7 +2,7 @@
   "name": "react-infinite-scroll",
   "version": "0.1.4",
   "description": "",
-  "main": "src/react-infinite-scroll.js",
+  "main": "src/umd.js",
   "scripts": {
     "test": "grunt lint"
   },
