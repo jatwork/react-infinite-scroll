@@ -44,11 +44,30 @@ module.exports = function (React) {
       , component: null
       }), props.children, props.hasMore && props.loader);
     },
+    // https://github.com/orgsync/react-list/blob/master/react-list.es6#L91-L99
+    getScrollParent: function () {
+      var el = React.findDOMNode(this);
+      var overflowKey = 'overflowY';// OVERFLOW_KEYS[this.props.axis];
+      while (el = el.parentElement) {
+        var overflow = window.getComputedStyle(el)[overflowKey];
+        if (overflow === 'auto' || overflow === 'scroll') {
+          return el;
+        }
+      }
+      return window;
+    },
+    // https://github.com/orgsync/react-list/blob/master/react-list.es6#L125-L131
+    getViewportSize: function () {
+      var scrollParent = this.scrollParent;
+      return scrollParent === window ?
+        window.innerHeight :
+        scrollParent.clientHeight;
+    },
     scrollListener: function () {
       if (!this.updated) return;
       var coords = this.getDOMNode().getBoundingClientRect();
 
-      if (coords.bottom < window.innerHeight + this.props.threshold) {
+      if (coords.bottom < this.getViewportSize() + this.props.threshold) {
         this.updated = false;
         this.props.loadMore(this.pageLoaded += 1);
       }
@@ -57,11 +76,13 @@ module.exports = function (React) {
       if (!this.props.hasMore) {
         return;
       }
+      this.scrollParent = this.getScrollParent();
       window.addEventListener('scroll', this.scrollListener);
       this.scrollListener();
     },
     detachScrollListener: function () {
       window.removeEventListener('scroll', this.scrollListener);
+      this.scrollParent = null;
     },
     componentWillUnmount: function () {
       this.detachScrollListener();
